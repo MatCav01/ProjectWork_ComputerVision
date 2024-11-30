@@ -36,14 +36,16 @@ class CIM_Dataset(ImageFolder):
         datasets = []
         targets = []
         for denomination in self.denominations:
-            for rotation in self.rotations:
-                data_dir = self.root + os.path.sep + denomination + '_CIM_A' #+ os.path.sep + rotation
-                datasets.append(ImageFolder(root=data_dir, transform=self.transform))
+            # for rotation in self.rotations:
+            data_dir = self.root + os.path.sep + denomination + '_CIM_A' #+ os.path.sep + rotation
+            dataset = ImageFolder(root=data_dir, transform=self.transform)
+            datasets.append(dataset)
 
-                target = []
-                for cls in self.classes:
-                    target.append(1 if cls == denomination or cls == rotation else 0)
-                targets.append(target)
+            rotation = dataset.targets
+            target = []
+            for cls in self.classes:
+                target.append(1 if cls == denomination or cls == rotation else 0)
+            targets.append(target)
         
         images = ConcatDataset(datasets)
         targets = torch.tensor(targets, dtype=torch.float32)
