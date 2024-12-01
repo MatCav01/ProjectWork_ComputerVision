@@ -2,7 +2,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 import torch
 from dataset_loading import CIM_Dataset
-from nn_loading import MultiLabelResnet18, train_model, valid_model, test_model
+from nn_utils import MultiLabelResnet18, train_model, valid_model, test_model
 
 batch_size = 64
 learning_rate = 0.001
