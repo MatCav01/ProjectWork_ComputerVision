@@ -18,6 +18,7 @@ class MultiLabelResnet18(torch.nn.Module):
 def train_model(model, train_loader, criterion, optimizer, device, n_classes):
     model.train()
     train_loss = 0.0
+
     mla = MultilabelAccuracy(num_labels=n_classes, average=None)
     accuracy = [0.0 for _ in range(n_classes)]
     accuracy = torch.tensor(accuracy, device=device)
@@ -41,14 +42,19 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
 
     return train_loss, accuracy.numpy()
 
-def valid_test_model(model, loader, criterion, device, n_classes):
+def valid_test_model(model, data_loader, criterion, device, n_classes, test = False):
     model.eval()
     total_loss = 0.0
+    
     mla = MultilabelAccuracy(num_labels=n_classes, average=None)
     accuracy = [0.0 for _ in range(n_classes)]
     accuracy = torch.tensor(accuracy, device=device)
+
+    if test:
+        mla_macroAvg = MultilabelAccuracy(num_labels=n_classes, average='macro')
+        accuracy_macroAvg = torch.tensor(0.0, device=device)
     
-    for images, labels in loader:
+    for images, labels in data_loader:
         images = images.to(device)
         labels = labels.to(device)
 
@@ -58,7 +64,14 @@ def valid_test_model(model, loader, criterion, device, n_classes):
         total_loss += loss.item()
         accuracy += mla(outputs, labels)
 
-    total_loss /= len(loader)
-    accuracy /= len(loader)
+        if test:
+            accuracy_macroAvg += mla_macroAvg(outputs, labels)
 
+    total_loss /= len(data_loader)
+    accuracy /= len(data_loader)
+
+    if test:
+        accuracy_macroAvg /= len(data_loader)
+        return total_loss, accuracy.numpy(), accuracy_macroAvg.numpy()
+    
     return total_loss, accuracy.numpy()
