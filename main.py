@@ -39,5 +39,5 @@ for epoch in range(n_epochs):
     print(f'\tValid Loss: {valid_loss:.6f}\n\tValid Accuracy: {valid_acc}\n')
 
 # test
-test_loss, test_acc = valid_test_model(model_net, test_loader, criterion, device, n_classes, test=True)
-print(f'Test Loss: {test_loss:.6f}\nTest Accuracy: {test_acc}')
+test_loss, test_acc, test_acc_macroAvg = valid_test_model(model_net, test_loader, criterion, device, n_classes, test=True)
+print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per class: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg}')
