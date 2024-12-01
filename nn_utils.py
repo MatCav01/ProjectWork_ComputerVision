@@ -41,46 +41,24 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
 
     return train_loss, accuracy.numpy()
 
-def valid_model(model, valid_loader, criterion, device, n_classes):
+def valid_test_model(model, loader, criterion, device, n_classes):
     model.eval()
-    valid_loss = 0.0
+    total_loss = 0.0
     mla = MultilabelAccuracy(num_labels=n_classes, average=None)
     accuracy = [0.0 for _ in range(n_classes)]
     accuracy = torch.tensor(accuracy, device=device)
     
-    for images, labels in valid_loader:
+    for images, labels in loader:
         images = images.to(device)
         labels = labels.to(device)
 
         outputs = model(images)
         loss = criterion(outputs, labels)
 
-        valid_loss += loss.item()
+        total_loss += loss.item()
         accuracy += mla(outputs, labels)
 
-    valid_loss /= len(valid_loader)
-    accuracy /= len(valid_loader)
+    total_loss /= len(loader)
+    accuracy /= len(loader)
 
-    return valid_loss, accuracy.numpy()
-
-def test_model(model, test_loader, criterion, device, n_classes):
-    model.eval()
-    test_loss = 0.0
-    mla = MultilabelAccuracy(num_labels=n_classes, average=None)
-    accuracy = [0.0 for _ in range(n_classes)]
-    accuracy = torch.tensor(accuracy, device=device)
-    
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels = labels.to(device)
-
-        outputs = model(images)
-        loss = criterion(outputs, labels)
-
-        test_loss += loss.item()
-        accuracy += mla(outputs, labels)
-
-    test_loss /= len(test_loader)
-    accuracy /= len(test_loader)
-
-    return test_loss, accuracy.numpy()
+    return total_loss, accuracy.numpy()

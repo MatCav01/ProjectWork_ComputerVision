@@ -2,7 +2,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 import torch
 from dataset_loading import CIM_Dataset
-from nn_utils import MultiLabelResnet18, train_model, valid_model, test_model
+from nn_utils import MultiLabelResnet18, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
@@ -32,7 +32,11 @@ optimizer = torch.optim.Adam(params=model_net.parameters(), lr=learning_rate)
 # train and valid
 for epoch in range(n_epochs):
     train_loss, train_acc = train_model(model_net, train_loader, criterion, optimizer, device, n_classes)
-    valid_loss, valid_acc = valid_model(model_net, valid_loader, criterion, device, n_classes)
+    valid_loss, valid_acc = valid_test_model(model_net, valid_loader, criterion, device, n_classes)
+    
     print(f'Epoch {epoch + 1}/{n_epochs}:')
     print(f'\tTrain Loss: {train_loss:.6f}\n\tTrain Accuracy: {train_acc}')
     print(f'\tValid Loss: {valid_loss:.6f}\n\tValid Accuracy: {valid_acc}\n')
+
+test_loss, test_acc = valid_test_model(model_net, test_loader, criterion, device, n_classes)
+print(f'Test Loss: {test_loss:.6f}\nTest Accuracy: {test_acc}')
