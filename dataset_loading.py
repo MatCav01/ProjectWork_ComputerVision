@@ -1,9 +1,7 @@
 from torchvision.datasets import VisionDataset, ImageFolder
 from torch.utils.data import ConcatDataset
-from torchvision import transforms
 import torch
 import os
-import matplotlib.pyplot as plt
 
 class CIM_Dataset(VisionDataset):
     """CIM Dataset
@@ -57,10 +55,3 @@ class CIM_Dataset(VisionDataset):
         target = self.targets[index]
 
         return image, target
-
-if __name__ == '__main__':
-    cim = CIM_Dataset(root='./ProjectWork_ComputerVision/DATABASE_CIM', transform=transforms.Resize((256, 256)))
-    print(cim.__len__())
-    plt.imshow(cim[0][0])
-    plt.axis('off')
-    plt.show()
