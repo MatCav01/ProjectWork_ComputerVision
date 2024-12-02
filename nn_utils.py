@@ -62,10 +62,10 @@ def valid_test_model(model, data_loader, criterion, device, n_classes, test = Fa
         loss = criterion(outputs, labels)
 
         total_loss += loss.item()
-        accuracy += mla(outputs, labels.to(torch.int32))
+        accuracy += mla(outputs, labels)
 
         if test:
-            accuracy_macroAvg += mla_macroAvg(outputs, labels.to(torch.int32))
+            accuracy_macroAvg += mla_macroAvg(outputs, labels)
 
     total_loss /= len(data_loader)
     accuracy = (100 * accuracy / len(data_loader)).cpu().numpy()
