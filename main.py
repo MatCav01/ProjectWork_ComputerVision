@@ -2,7 +2,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 import torch
 from dataset_loading import CIM_Dataset
-from nn_utils import MultiLabelResnet18, train_model, valid_test_model
+from nn_utils import MultiLabelResNet, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
@@ -25,7 +25,7 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-model_net = MultiLabelResnet18(n_classes).to(device)
+model_net = MultiLabelResNet(n_classes).to(device)
 criterion = torch.nn.BCELoss()
 optimizer = torch.optim.Adam(params=model_net.parameters(), lr=learning_rate)
 
