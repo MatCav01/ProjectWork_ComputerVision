@@ -19,7 +19,7 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
     model.train()
     train_loss = 0.0
 
-    mla = MultilabelAccuracy(num_labels=n_classes, average=None)
+    mla = MultilabelAccuracy(num_labels=n_classes, average=None).to(device)
     accuracy = [0.0 for _ in range(n_classes)]
     accuracy = torch.tensor(accuracy, device=device)
     
@@ -38,20 +38,20 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
         accuracy += mla(outputs, labels)
 
     train_loss /= len(train_loader)
-    accuracy /= len(train_loader)
+    accuracy = (100 * accuracy / len(train_loader)).cpu().numpy()
 
-    return train_loss, accuracy.numpy()
+    return train_loss, accuracy
 
 def valid_test_model(model, data_loader, criterion, device, n_classes, test = False):
     model.eval()
     total_loss = 0.0
     
-    mla = MultilabelAccuracy(num_labels=n_classes, average=None)
+    mla = MultilabelAccuracy(num_labels=n_classes, average=None).to(device)
     accuracy = [0.0 for _ in range(n_classes)]
     accuracy = torch.tensor(accuracy, device=device)
 
     if test:
-        mla_macroAvg = MultilabelAccuracy(num_labels=n_classes, average='macro')
+        mla_macroAvg = MultilabelAccuracy(num_labels=n_classes, average='macro').to(device)
         accuracy_macroAvg = torch.tensor(0.0, device=device)
     
     for images, labels in data_loader:
@@ -62,16 +62,16 @@ def valid_test_model(model, data_loader, criterion, device, n_classes, test = Fa
         loss = criterion(outputs, labels)
 
         total_loss += loss.item()
-        accuracy += mla(outputs, labels)
+        accuracy += mla(outputs, labels.to(torch.int32))
 
         if test:
-            accuracy_macroAvg += mla_macroAvg(outputs, labels)
+            accuracy_macroAvg += mla_macroAvg(outputs, labels.to(torch.int32))
 
     total_loss /= len(data_loader)
-    accuracy /= len(data_loader)
+    accuracy = (100 * accuracy / len(data_loader)).cpu().numpy()
 
     if test:
-        accuracy_macroAvg /= len(data_loader)
-        return total_loss, accuracy.numpy(), accuracy_macroAvg.numpy()
+        accuracy_macroAvg = (100 * accuracy_macroAvg / len(data_loader)).cpu().numpy()
+        return total_loss, accuracy, accuracy_macroAvg
     
-    return total_loss, accuracy.numpy()
+    return total_loss, accuracy

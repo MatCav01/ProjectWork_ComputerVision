@@ -43,7 +43,7 @@ class CIM_Dataset(VisionDataset):
                 targets.append(target)
         
         images = ConcatDataset(datasets)
-        targets = torch.tensor(targets)
+        targets = torch.tensor(targets, dtype=torch.float32)
 
         return images, targets
     

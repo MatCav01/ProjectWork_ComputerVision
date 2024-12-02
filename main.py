@@ -6,7 +6,7 @@ from nn_utils import MultiLabelResnet18, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
-n_epochs = 10
+n_epochs = 2
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 data_transform = transforms.Compose([
@@ -16,9 +16,9 @@ data_transform = transforms.Compose([
 
 dataset = CIM_Dataset(root='./DATABASE_CIM', valid=False, transform=data_transform)
 n_classes = len(dataset.classes)
-with torch.Generator() as generator:
-    generator.manual_seed(42)
-    train_dataset, test_dataset = random_split(dataset, lengths=[0.8, 0.2], generator=generator)
+generator = torch.Generator()
+generator.manual_seed(42)
+train_dataset, test_dataset = random_split(dataset, lengths=[0.8, 0.2], generator=generator)
 valid_dataset = CIM_Dataset(root='./DATABASE_CIM', valid=True, transform=data_transform)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
