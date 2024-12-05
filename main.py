@@ -1,8 +1,8 @@
 from torchvision import transforms
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 import torch
-from dataset_loading import CIM_Dataset
-from nn_utils import MultiLabelResNet, train_model, valid_test_model
+from cim_dataset import CIM_Dataset, CIM_Dataset_Test
+from train_nn import MultiLabelResNet, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
@@ -14,12 +14,11 @@ data_transform = transforms.Compose([
     transforms.ToTensor()
 ])
 
-dataset = CIM_Dataset(root='./DATABASE_CIM', valid=False, transform=data_transform)
-n_classes = len(dataset.classes)
-generator = torch.Generator()
-generator.manual_seed(42)
-train_dataset, test_dataset = random_split(dataset, lengths=[0.8, 0.2], generator=generator)
+train_dataset = CIM_Dataset(root='./DATABASE_CIM', valid=False, transform=data_transform)
 valid_dataset = CIM_Dataset(root='./DATABASE_CIM', valid=True, transform=data_transform)
+test_dataset = CIM_Dataset_Test(train_dataset, valid_dataset, train_amount=0.5, n_samples=512)
+
+n_classes = len(train_dataset.classes)
 
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)

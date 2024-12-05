@@ -40,7 +40,7 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
         accuracy += mla(outputs, labels)
 
     train_loss /= len(train_loader)
-    accuracy = (100 * accuracy / len(train_loader)).cpu().numpy()
+    accuracy = (100 * accuracy / len(train_loader)).tolist()
 
     return train_loss, accuracy
 
@@ -70,10 +70,10 @@ def valid_test_model(model, data_loader, criterion, device, n_classes, test = Fa
             accuracy_macroAvg += mla_macroAvg(outputs, labels)
 
     total_loss /= len(data_loader)
-    accuracy = (100 * accuracy / len(data_loader)).cpu().numpy()
+    accuracy = (100 * accuracy / len(data_loader)).tolist()
 
     if test:
-        accuracy_macroAvg = (100 * accuracy_macroAvg / len(data_loader)).cpu().numpy()
+        accuracy_macroAvg = (100 * accuracy_macroAvg / len(data_loader)).tolist()
         return total_loss, accuracy, accuracy_macroAvg
     
     return total_loss, accuracy

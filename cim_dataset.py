@@ -1,5 +1,5 @@
 from torchvision.datasets import VisionDataset, ImageFolder
-from torch.utils.data import ConcatDataset
+from torch.utils.data import ConcatDataset, Subset
 import torch
 import os
 
@@ -53,5 +53,43 @@ class CIM_Dataset(VisionDataset):
     def __getitem__(self, index):
         image, _ = self.images[index]
         target = self.targets[index]
+
+        return image, target
+
+class CIM_Dataset_Test(VisionDataset):
+    def __init__(self, train_dataset: CIM_Dataset, valid_dataset: CIM_Dataset, train_amount = 0.5, n_samples = 512):
+        self.train_dataset = train_dataset
+        self.valid_dataset = valid_dataset
+        self.train_amount = train_amount
+        self.n_samples = n_samples
+
+        # self.denominations = train_dataset.denominations
+        # self.rotations = train_dataset.rotations
+        # self.classes = train_dataset.classes
+        # self.class_to_idx = train_dataset.class_to_idx
+
+        self.data = self.load_data()
+
+    def load_data(self):
+        generator = torch.Generator()
+        generator.manual_seed(42)
+
+        train_length = self.train_amount * self.n_samples
+        indices = torch.randint(low=0, high=len(self.train_dataset), size=(train_length,), generator=generator).tolist()
+        train_subset = Subset(self.train_dataset, indices)
+
+        valid_length = (1 - self.train_amount) * self.n_samples
+        indices = torch.randint(low=0, high=len(self.valid_dataset), size=(valid_length,), generator=generator).tolist()
+        valid_subset = Subset(self.valid_dataset, indices)
+
+        dataset = ConcatDataset([train_subset, valid_subset])
+
+        return dataset
+
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, index):
+        image, target = self.data[index]
 
         return image, target
