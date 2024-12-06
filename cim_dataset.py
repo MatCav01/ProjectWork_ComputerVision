@@ -74,11 +74,11 @@ class CIM_Dataset_Test(VisionDataset):
         generator = torch.Generator()
         generator.manual_seed(42)
 
-        train_length = self.train_amount * self.n_samples
+        train_length = int(self.train_amount * self.n_samples)
         indices = torch.randint(low=0, high=len(self.train_dataset), size=(train_length,), generator=generator).tolist()
         train_subset = Subset(self.train_dataset, indices)
 
-        valid_length = (1 - self.train_amount) * self.n_samples
+        valid_length = int((1 - self.train_amount) * self.n_samples)
         indices = torch.randint(low=0, high=len(self.valid_dataset), size=(valid_length,), generator=generator).tolist()
         valid_subset = Subset(self.valid_dataset, indices)
 

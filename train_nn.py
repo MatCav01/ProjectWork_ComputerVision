@@ -6,8 +6,8 @@ import timm
 class MultiLabelResNet(torch.nn.Module):
     def __init__(self, n_classes):
         super().__init__()
-        # self.resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        self.resnet = timm.create_model('resnet14t.c3_in1k', pretrained=True)
+        self.resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+        # self.resnet = timm.create_model('resnet14t.c3_in1k', pretrained=True)
         self.resnet.fc = torch.nn.Sequential(
             torch.nn.Linear(self.resnet.fc.in_features, n_classes),
             torch.nn.Sigmoid()
@@ -15,6 +15,33 @@ class MultiLabelResNet(torch.nn.Module):
     
     def forward(self, x):
         out = self.resnet(x)
+        return out
+    
+class CIM_Net(torch.nn.Module):
+    def __init__(self, n_classes):
+        super().__init__()
+        self.conv1 = torch.nn.Sequential(
+            torch.nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=2)
+        )
+
+        self.conv2 = torch.nn.Sequential(
+            torch.nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=2)
+        )
+
+        self.fc = torch.nn.Sequential(
+            torch.nn.Linear(32 * 64 * 64, n_classes),
+            torch.nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        out = self.conv1(x)
+        out = self.conv2(out)
+        out = self.fc(out.view(out.size(0), -1))
+
         return out
 
 def train_model(model, train_loader, criterion, optimizer, device, n_classes):
