@@ -6,7 +6,7 @@ from train_nn import MultiLabelResNet, CIM_Net, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
-n_epochs = 2
+n_epochs = 3
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 data_transform = transforms.Compose([
@@ -40,4 +40,11 @@ for epoch in range(n_epochs):
 
 # test
 test_loss, test_acc, test_acc_macroAvg = valid_test_model(model_net, test_loader, criterion, device, n_classes, test=True)
-print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per class: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg}')
+print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per class: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg:.3f}')
+
+save_weigths = input('\nDo you want to save weigths and biases? ')
+if save_weigths in ['y', 'yes', 'Y', 'Yes', 'YES']:
+    torch.save(model_net.state_dict(), './weigths_biases.pt')
+    print('WEIGHTS AND BIASES SAVED!')
+else:
+    print('WEIGHTS AND BIASES NOT SAVED!')
