@@ -24,8 +24,8 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-# model_net = MultiLabelResNet(n_classes).to(device)
-model_net = CIM_Net(n_classes).to(device)
+model_net = MultiLabelResNet(n_classes).to(device)
+# model_net = CIM_Net(n_classes).to(device)
 criterion = torch.nn.BCELoss()
 optimizer = torch.optim.Adam(params=model_net.parameters(), lr=learning_rate)
 
@@ -42,9 +42,9 @@ for epoch in range(n_epochs):
 test_loss, test_acc, test_acc_macroAvg = valid_test_model(model_net, test_loader, criterion, device, n_classes, test=True)
 print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per class: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg:.3f}')
 
-save_weigths = input('\nWould you like to save weigths and biases? ')
+save_weigths = input('\nWould you like to save weights and biases? ')
 if save_weigths in ['y', 'yes', 'Y', 'Yes', 'YES']:
-    torch.save(model_net.state_dict(), './weigths_biases.pt')
+    torch.save(model_net.state_dict(), './weights_biases.pt')
     print('WEIGHTS AND BIASES SAVED!')
 else:
     print('WEIGHTS AND BIASES NOT SAVED!')
