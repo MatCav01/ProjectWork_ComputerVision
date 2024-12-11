@@ -4,15 +4,20 @@ from torchmetrics.classification.accuracy import MultilabelAccuracy
 import timm
 
 class MultiLabelResNet(torch.nn.Module):
-    def __init__(self, n_classes):
+    def __init__(self, n_classes, transfer_learning = False):
         super().__init__()
-        # self.resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        self.resnet = models.resnet18()
         # self.resnet = timm.create_model('resnet14t.c3_in1k', pretrained=True)
+        self.resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
         self.resnet.fc = torch.nn.Sequential(
             torch.nn.Linear(self.resnet.fc.in_features, n_classes),
             torch.nn.Sigmoid()
         )
+
+        if transfer_learning:
+            for params in self.resnet.parameters():
+                params.requires_grad = False
+            for params in self.resnet.fc.parameters():
+                params.requires_grad = True
     
     def forward(self, x):
         out = self.resnet(x)

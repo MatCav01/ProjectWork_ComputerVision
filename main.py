@@ -6,7 +6,7 @@ from train_nn import MultiLabelResNet, CIM_Net, train_model, valid_test_model
 
 batch_size = 64
 learning_rate = 0.001
-n_epochs = 3
+n_epochs = 5
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 data_transform = transforms.Compose([
@@ -24,7 +24,7 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-model_net = MultiLabelResNet(n_classes).to(device)
+model_net = MultiLabelResNet(n_classes, transfer_learning=True).to(device)
 # model_net = CIM_Net(n_classes).to(device)
 criterion = torch.nn.BCELoss()
 optimizer = torch.optim.Adam(params=model_net.parameters(), lr=learning_rate)
