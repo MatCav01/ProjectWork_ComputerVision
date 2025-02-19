@@ -4,27 +4,37 @@ from torchmetrics.classification.accuracy import MultilabelAccuracy
 import timm
 
 class MultiLabelResNet(torch.nn.Module):
-    def __init__(self, n_classes, transfer_learning = False):
+    """
+    MultiLabelResNet: a ResNet modified for multi-label tasks
+    
+    Args:
+        n_labels: The number of labels, which is equal to the number of neurons in the fc layer
+    """
+    def __init__(self, n_labels):
         super().__init__()
         # self.resnet = timm.create_model('resnet14t.c3_in1k', pretrained=True)
         self.resnet = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
         self.resnet.fc = torch.nn.Sequential(
-            torch.nn.Linear(self.resnet.fc.in_features, n_classes),
+            torch.nn.Linear(self.resnet.fc.in_features, n_labels),
             torch.nn.Sigmoid()
         )
-
-        if transfer_learning:
-            for params in self.resnet.parameters():
-                params.requires_grad = False
-            for params in self.resnet.fc.parameters():
-                params.requires_grad = True
     
     def forward(self, x):
         out = self.resnet(x)
         return out
     
+    def transfer_learning(self, mode=True):
+        if mode:
+            for params in self.resnet.parameters():
+                params.requires_grad = False
+            for params in self.resnet.fc.parameters():
+                params.requires_grad = True
+        else:
+            for params in self.resnet.parameters():
+                params.requires_grad = True
+    
 class CIM_Net(torch.nn.Module):
-    def __init__(self, n_classes):
+    def __init__(self, n_labels):
         super().__init__()
         self.conv1 = torch.nn.Sequential(
             torch.nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
@@ -39,7 +49,7 @@ class CIM_Net(torch.nn.Module):
         )
 
         self.fc = torch.nn.Sequential(
-            torch.nn.Linear(32 * 64 * 64, n_classes),
+            torch.nn.Linear(32 * 64 * 64, n_labels),
             torch.nn.Sigmoid()
         )
 
@@ -50,12 +60,12 @@ class CIM_Net(torch.nn.Module):
 
         return out
 
-def train_model(model, train_loader, criterion, optimizer, device, n_classes):
+def train_model(model, train_loader, criterion, optimizer, device, n_labels):
     model.train()
     train_loss = 0.0
 
-    mla = MultilabelAccuracy(num_labels=n_classes, average=None).to(device)
-    accuracy = [0.0 for _ in range(n_classes)]
+    mla = MultilabelAccuracy(num_labels=n_labels, average=None).to(device)
+    accuracy = [0.0 for _ in range(n_labels)]
     accuracy = torch.tensor(accuracy, device=device)
     
     for images, labels in train_loader:
@@ -77,16 +87,16 @@ def train_model(model, train_loader, criterion, optimizer, device, n_classes):
 
     return train_loss, accuracy
 
-def valid_test_model(model, data_loader, criterion, device, n_classes, test = False):
+def valid_test_model(model, data_loader, criterion, device, n_labels, test = False):
     model.eval()
     total_loss = 0.0
     
-    mla = MultilabelAccuracy(num_labels=n_classes, average=None).to(device)
-    accuracy = [0.0 for _ in range(n_classes)]
+    mla = MultilabelAccuracy(num_labels=n_labels, average=None).to(device)
+    accuracy = [0.0 for _ in range(n_labels)]
     accuracy = torch.tensor(accuracy, device=device)
 
     if test:
-        mla_macroAvg = MultilabelAccuracy(num_labels=n_classes, average='macro').to(device)
+        mla_macroAvg = MultilabelAccuracy(num_labels=n_labels, average='macro').to(device)
         accuracy_macroAvg = torch.tensor(0.0, device=device)
     
     for images, labels in data_loader:

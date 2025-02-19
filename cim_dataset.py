@@ -4,7 +4,8 @@ import torch
 import os
 
 class CIM_Dataset(VisionDataset):
-    """CIM Dataset
+    """
+    CIM Dataset
     
     Args:
         root: Root directory
@@ -26,7 +27,7 @@ class CIM_Dataset(VisionDataset):
     def load_data(self):
         self.root = os.path.join(self.root, 'ValidationSet' if self.valid else 'DataSet')
         if not os.path.exists(self.root):
-            print(self.root)
+            # print(self.root)
             raise RuntimeError(f'Path "{self.root}" does not exist')
         
         datasets = []
@@ -57,6 +58,15 @@ class CIM_Dataset(VisionDataset):
         return image, target
 
 class CIM_Dataset_Test(VisionDataset):
+    """
+    CIM_Dataset_Test
+
+    Args:
+        train_dataset: Training Set
+        valid_dataset: Validation Set
+        train_amount: The amount of training samples out of the total number of samples
+        n_samples: The total number of samples that will form the CIM Test Set
+    """
     def __init__(self, train_dataset: CIM_Dataset, valid_dataset: CIM_Dataset, train_amount = 0.5, n_samples = 512):
         self.train_dataset = train_dataset
         self.valid_dataset = valid_dataset
