@@ -26,27 +26,31 @@ class CIM_Dataset(VisionDataset):
 
     def load_data(self):
         self.root = os.path.join(self.root, 'ValidationSet' if self.valid else 'DataSet')
-        if not os.path.exists(self.root):
-            print(f'Path \"{self.root}\" does not exist!', file=sys.stderr)
+        # if not os.path.exists(self.root):
+        #     raise FileNotFoundError(f'Path \"{self.root}\" does not exist!')
+
+        try:
+            datasets = []
+            targets = []
+            for denomination in self.denominations:
+                data_dir = os.path.join(self.root, f'{denomination}_CIM_A')
+                image_folder = ImageFolder(root=data_dir, transform=self.transform)
+                datasets.append(image_folder)
+
+                for rotation_index in image_folder.targets:
+                    target = []
+                    for cls in self.classes:
+                        target.append(1 if cls == denomination or cls == self.rotations[rotation_index] else 0)
+                    targets.append(target)
+            
+            images = ConcatDataset(datasets)
+            targets = torch.tensor(targets, dtype=torch.float32)
+
+            return images, targets
+        
+        except FileNotFoundError as e:
+            print(e.with_traceback(None), file=sys.stderr)
             sys.exit(1)
-        
-        datasets = []
-        targets = []
-        for denomination in self.denominations:
-            data_dir = os.path.join(self.root, f'{denomination}_CIM_A')
-            image_folder = ImageFolder(root=data_dir, transform=self.transform)
-            datasets.append(image_folder)
-
-            for rotation_index in image_folder.targets:
-                target = []
-                for cls in self.classes:
-                    target.append(1 if cls == denomination or cls == self.rotations[rotation_index] else 0)
-                targets.append(target)
-        
-        images = ConcatDataset(datasets)
-        targets = torch.tensor(targets, dtype=torch.float32)
-
-        return images, targets
     
     def __len__(self):
         return len(self.images)

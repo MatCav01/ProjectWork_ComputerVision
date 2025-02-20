@@ -24,7 +24,7 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
-model_net = MultiLabelResNet(n_labels, transfer_learning=True).to(device)
+model_net = MultiLabelResNet(n_labels).to(device)
 model_net.transfer_learning()
 # model_net = CIM_Net(n_labels).to(device)
 
