@@ -1,7 +1,7 @@
 from torchvision.datasets import VisionDataset, ImageFolder
 from torch.utils.data import ConcatDataset, Subset
 import torch
-import os
+import os, sys
 
 class CIM_Dataset(VisionDataset):
     """
@@ -27,8 +27,8 @@ class CIM_Dataset(VisionDataset):
     def load_data(self):
         self.root = os.path.join(self.root, 'ValidationSet' if self.valid else 'DataSet')
         if not os.path.exists(self.root):
-            # print(self.root)
-            raise RuntimeError(f'Path "{self.root}" does not exist')
+            print(f'Path \"{self.root}\" does not exist!', file=sys.stderr)
+            sys.exit(1)
         
         datasets = []
         targets = []
@@ -88,7 +88,7 @@ class CIM_Dataset_Test(VisionDataset):
         indices = torch.randint(low=0, high=len(self.train_dataset), size=(train_length,), generator=generator).tolist()
         train_subset = Subset(self.train_dataset, indices)
 
-        valid_length = int((1 - self.train_amount) * self.n_samples)
+        valid_length = self.n_samples - train_length
         indices = torch.randint(low=0, high=len(self.valid_dataset), size=(valid_length,), generator=generator).tolist()
         valid_subset = Subset(self.valid_dataset, indices)
 

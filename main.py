@@ -42,11 +42,4 @@ for epoch in range(n_epochs):
 
 # test
 test_loss, test_acc, test_acc_macroAvg = valid_test_model(model_net, test_loader, criterion, device, n_labels, test=True)
-print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per class: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg:.3f}')
-
-# save_weigths = input('\nWould you like to save weights and biases? ')
-# if save_weigths in ['y', 'yes', 'Y', 'Yes', 'YES']:
-#     torch.save(model_net.state_dict(), './weights_biases.pt')
-#     print('WEIGHTS AND BIASES SAVED!')
-# else:
-#     print('WEIGHTS AND BIASES NOT SAVED!')
+print(f'Test Loss: {test_loss:.6f}\nTest Accuracy per label: {test_acc}\nCumulative Test Accuracy: {test_acc_macroAvg:.3f}')
